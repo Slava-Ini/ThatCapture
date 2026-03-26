@@ -1,2 +1,2 @@
 # ThatCapture
-Small cross-platform screenshot taking library 
+Small cross-platform screenshot library 
