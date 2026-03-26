@@ -24,6 +24,7 @@ public sealed class ScreenCapture : IScreenCapture
             return new MacScreenCapture();
 
         var sessionType = Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") ?? "";
+
         return sessionType.Equals("wayland", StringComparison.OrdinalIgnoreCase)
             ? new WaylandScreenCapture()
             : new X11ScreenCapture();

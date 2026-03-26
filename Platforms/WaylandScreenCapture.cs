@@ -1,4 +1,3 @@
-using System.IO;
 using System.Runtime.InteropServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -33,7 +32,7 @@ internal sealed class WaylandScreenCapture : IScreenCapture
 
         int stride = width * 4;
         var pixels = new byte[stride * height];
-        img.CopyPixelDataTo(MemoryMarshal.Cast<byte, Bgra32>(pixels));
+        img.CopyPixelDataTo(MemoryMarshal.Cast<byte, Bgra32>(pixels.AsSpan()));
 
         return new CapturedFrame(pixels, width, height, stride, PixelFormat.Bgra8888);
     }
