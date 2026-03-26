@@ -12,7 +12,7 @@ public sealed class ScreenCapture : IScreenCapture
         _impl = CreatePlatformImpl();
     }
 
-    public Task<CapturedFrame?> CaptureAreaAsync(int x, int y, int width, int height) =>
+    public Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height) =>
         _impl.CaptureAreaAsync(x, y, width, height);
 
     private static IScreenCapture CreatePlatformImpl()

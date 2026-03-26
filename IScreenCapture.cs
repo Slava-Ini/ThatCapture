@@ -2,5 +2,5 @@ namespace ThatCapture;
 
 public interface IScreenCapture
 {
-    Task<CapturedFrame?> CaptureAreaAsync(int x, int y, int width, int height);
+    Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height);
 }

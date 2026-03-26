@@ -18,18 +18,20 @@ internal sealed class X11ScreenCapture : IScreenCapture
     [DllImport("libX11.so.6")] private static extern int XDestroyImage(IntPtr ximage);
     [DllImport("libX11.so.6")] private static extern int XCloseDisplay(IntPtr display);
 
-    public Task<CapturedFrame?> CaptureAreaAsync(int x, int y, int width, int height) =>
+    public Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height) =>
         Task.Run(() => Capture(x, y, width, height));
 
-    private static CapturedFrame? Capture(int x, int y, int width, int height)
+    private static CaptureResult Capture(int x, int y, int width, int height)
     {
         var display = XOpenDisplay(IntPtr.Zero);
-        if (display == IntPtr.Zero) return null;
+        if (display == IntPtr.Zero)
+            return new CaptureResult.Err(new CaptureError.CaptureFailed());
         try
         {
             var root = XDefaultRootWindow(display);
             var ximage = XGetImage(display, root, x, y, (uint)width, (uint)height, AllPlanes, ZPixmap);
-            if (ximage == IntPtr.Zero) return null;
+            if (ximage == IntPtr.Zero)
+                return new CaptureResult.Err(new CaptureError.CaptureFailed());
             try
             {
                 return XImageToFrame(ximage, width, height);
@@ -45,13 +47,14 @@ internal sealed class X11ScreenCapture : IScreenCapture
         }
     }
 
-    private static CapturedFrame? XImageToFrame(IntPtr ximage, int width, int height)
+    private static CaptureResult XImageToFrame(IntPtr ximage, int width, int height)
     {
         var dataPtr = Marshal.ReadIntPtr(ximage, DataOffset);
         var bytesPerLine = Marshal.ReadInt32(ximage, BytesPerLineOffset);
         var bitsPerPixel = Marshal.ReadInt32(ximage, BitsPerPixelOffset);
 
-        if (bitsPerPixel != 32 || dataPtr == IntPtr.Zero) return null;
+        if (bitsPerPixel != 32 || dataPtr == IntPtr.Zero)
+            return new CaptureResult.Err(new CaptureError.CaptureFailed());
 
         int stride = width * 4;
         var pixels = new byte[stride * height];
@@ -63,6 +66,7 @@ internal sealed class X11ScreenCapture : IScreenCapture
             Buffer.BlockCopy(row, 0, pixels, y * stride, width * 4);
         }
 
-        return new CapturedFrame(pixels, width, height, stride, PixelFormat.Bgra8888);
+        return new CaptureResult.Ok(new CapturedFrame(pixels, width, height, stride, PixelFormat.Bgra8888));
     }
 }
+

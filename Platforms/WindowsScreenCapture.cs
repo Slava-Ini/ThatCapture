@@ -8,10 +8,10 @@ namespace ThatCapture.Platforms;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowsScreenCapture : IScreenCapture
 {
-    public Task<CapturedFrame?> CaptureAreaAsync(int x, int y, int width, int height) =>
+    public Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height) =>
         Task.Run(() => Capture(x, y, width, height));
 
-    private static CapturedFrame? Capture(int x, int y, int width, int height)
+    private static CaptureResult Capture(int x, int y, int width, int height)
     {
         using var bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
         using var graphics = Graphics.FromImage(bitmap);
@@ -26,7 +26,7 @@ internal sealed class WindowsScreenCapture : IScreenCapture
             int stride = bmpData.Stride;
             var pixels = new byte[stride * height];
             Marshal.Copy(bmpData.Scan0, pixels, 0, pixels.Length);
-            return new CapturedFrame(pixels, width, height, stride, PixelFormat.Bgra8888);
+            return new CaptureResult.Ok(new CapturedFrame(pixels, width, height, stride, PixelFormat.Bgra8888));
         }
         finally
         {

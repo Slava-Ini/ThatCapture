@@ -21,14 +21,15 @@ internal sealed class MacScreenCapture : IScreenCapture
     private struct CGRect { public double X, Y, Width, Height; }
 
     // kCGWindowListOptionAll = 0, kCGNullWindowID = 0, kCGWindowImageDefault = 0
-    public Task<CapturedFrame?> CaptureAreaAsync(int x, int y, int width, int height) =>
+    public Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height) =>
         Task.Run(() => Capture(x, y, width, height));
 
-    private static CapturedFrame? Capture(int x, int y, int width, int height)
+    private static CaptureResult Capture(int x, int y, int width, int height)
     {
         var rect = new CGRect { X = x, Y = y, Width = width, Height = height };
         var image = CGWindowListCreateImage(rect, 0, 0, 0);
-        if (image == IntPtr.Zero) return null;
+        if (image == IntPtr.Zero)
+            return new CaptureResult.Err(new CaptureError.PermissionDenied());
 
         try
         {
@@ -38,7 +39,8 @@ internal sealed class MacScreenCapture : IScreenCapture
 
             var provider = CGImageGetDataProvider(image);
             var data = CGDataProviderCopyData(provider);
-            if (data == IntPtr.Zero) return null;
+            if (data == IntPtr.Zero)
+                return new CaptureResult.Err(new CaptureError.CaptureFailed());
 
             try
             {
@@ -46,7 +48,7 @@ internal sealed class MacScreenCapture : IScreenCapture
                 var ptr = CFDataGetBytePtr(data);
                 var pixels = new byte[length];
                 Marshal.Copy(ptr, pixels, 0, length);
-                return new CapturedFrame(pixels, imgWidth, imgHeight, stride, PixelFormat.Bgra8888);
+                return new CaptureResult.Ok(new CapturedFrame(pixels, imgWidth, imgHeight, stride, PixelFormat.Bgra8888));
             }
             finally
             {
