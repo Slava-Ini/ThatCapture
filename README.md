@@ -1,15 +1,15 @@
 # ThatCapture [DRAFT]
 
-Small cross-platform screen capture library for .NET.
+Small cross-platform screen capture library for .NET
 
 ## Platform support
 
-| Platform        | Support | Status      | Method                          | Dependency              |
-|-----------------|---------|-------------|---------------------------------|-------------------------|
-| Windows         | ✅      | ✅ Works    | `Graphics.CopyFromScreen`       | `System.Drawing.Common` |
-| macOS           | ✅      | ❓ Testing  | `CGWindowListCreateImage`       | CoreGraphics (system)   |
-| Linux (X11)     | ✅      | ✅ Works    | `XGetImage`                     | libX11 (system)         |
-| Linux (Wayland) | ✅      | ✅ Works    | `xdg-desktop-portal` Screenshot | `Tmds.DBus.Protocol`    |
+| Platform        | Support | Method                          | Dependency              |
+|-----------------|---------|---------------------------------|-------------------------|
+| Windows         | ✅      | `Graphics.CopyFromScreen`       | `System.Drawing.Common` |
+| macOS           | ✅      | `CGWindowListCreateImage`       | CoreGraphics (system)   |
+| Linux (X11)     | ✅      | `XGetImage`                     | libX11 (system)         |
+| Linux (Wayland) | ✅      | `xdg-desktop-portal` Screenshot | `Tmds.DBus.Protocol`    |
 
 > **Wayland note:** the first capture will show a system permission prompt from the desktop portal. This is a Wayland security requirement and cannot be bypassed. After the user accepts, subsequent calls proceed silently.
 
