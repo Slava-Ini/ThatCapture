@@ -12,11 +12,16 @@ internal sealed class X11ScreenCapture : IScreenCapture
     private const int ZPixmap = 2;
     private const ulong AllPlanes = ulong.MaxValue;
 
-    [DllImport("libX11.so.6")] private static extern IntPtr XOpenDisplay(IntPtr display);
-    [DllImport("libX11.so.6")] private static extern IntPtr XDefaultRootWindow(IntPtr display);
-    [DllImport("libX11.so.6")] private static extern IntPtr XGetImage(IntPtr display, IntPtr drawable, int x, int y, uint width, uint height, ulong planeMask, int format);
-    [DllImport("libX11.so.6")] private static extern int XDestroyImage(IntPtr ximage);
-    [DllImport("libX11.so.6")] private static extern int XCloseDisplay(IntPtr display);
+    [DllImport("libX11.so.6")]
+    private static extern IntPtr XOpenDisplay(IntPtr display);
+    [DllImport("libX11.so.6")]
+    private static extern IntPtr XDefaultRootWindow(IntPtr display);
+    [DllImport("libX11.so.6")]
+    private static extern IntPtr XGetImage(IntPtr display, IntPtr drawable, int x, int y, uint width, uint height, ulong planeMask, int format);
+    [DllImport("libX11.so.6")]
+    private static extern int XDestroyImage(IntPtr ximage);
+    [DllImport("libX11.so.6")]
+    private static extern int XCloseDisplay(IntPtr display);
 
     public Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height) =>
         Task.Run(() => Capture(x, y, width, height));

@@ -8,7 +8,7 @@ Small cross-platform screen capture library for .NET.
 |-----------------|---------|-------------|---------------------------------|-------------------------|
 | Windows         | ✅      | ✅ Works    | `Graphics.CopyFromScreen`       | `System.Drawing.Common` |
 | macOS           | ✅      | ❓ Testing  | `CGWindowListCreateImage`       | CoreGraphics (system)   |
-| Linux (X11)     | ✅      | ❓ Testing  | `XGetImage`                     | libX11 (system)         |
+| Linux (X11)     | ✅      | ✅ Works    | `XGetImage`                     | libX11 (system)         |
 | Linux (Wayland) | ✅      | ✅ Works    | `xdg-desktop-portal` Screenshot | `Tmds.DBus.Protocol`    |
 
 > **Wayland note:** the first capture will show a system permission prompt from the desktop portal. This is a Wayland security requirement and cannot be bypassed. After the user accepts, subsequent calls proceed silently.

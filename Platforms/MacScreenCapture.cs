@@ -7,15 +7,24 @@ internal sealed class MacScreenCapture : IScreenCapture
     private const string CoreGraphics = "/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics";
     private const string CoreFoundation = "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
 
-    [DllImport(CoreGraphics)] private static extern IntPtr CGWindowListCreateImage(CGRect screenBounds, uint listOption, uint windowID, uint imageOption);
-    [DllImport(CoreGraphics)] private static extern nint CGImageGetWidth(IntPtr image);
-    [DllImport(CoreGraphics)] private static extern nint CGImageGetHeight(IntPtr image);
-    [DllImport(CoreGraphics)] private static extern nint CGImageGetBytesPerRow(IntPtr image);
-    [DllImport(CoreGraphics)] private static extern IntPtr CGImageGetDataProvider(IntPtr image);
-    [DllImport(CoreGraphics)] private static extern IntPtr CGDataProviderCopyData(IntPtr provider);
-    [DllImport(CoreFoundation)] private static extern nint CFDataGetLength(IntPtr data);
-    [DllImport(CoreFoundation)] private static extern IntPtr CFDataGetBytePtr(IntPtr data);
-    [DllImport(CoreFoundation)] private static extern void CFRelease(IntPtr cf);
+    [DllImport(CoreGraphics)]
+    private static extern IntPtr CGWindowListCreateImage(CGRect screenBounds, uint listOption, uint windowID, uint imageOption);
+    [DllImport(CoreGraphics)]
+    private static extern nint CGImageGetWidth(IntPtr image);
+    [DllImport(CoreGraphics)]
+    private static extern nint CGImageGetHeight(IntPtr image);
+    [DllImport(CoreGraphics)]
+    private static extern nint CGImageGetBytesPerRow(IntPtr image);
+    [DllImport(CoreGraphics)]
+    private static extern IntPtr CGImageGetDataProvider(IntPtr image);
+    [DllImport(CoreGraphics)]
+    private static extern IntPtr CGDataProviderCopyData(IntPtr provider);
+    [DllImport(CoreFoundation)]
+    private static extern nint CFDataGetLength(IntPtr data);
+    [DllImport(CoreFoundation)]
+    private static extern IntPtr CFDataGetBytePtr(IntPtr data);
+    [DllImport(CoreFoundation)]
+    private static extern void CFRelease(IntPtr cf);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct CGRect { public double X, Y, Width, Height; }
