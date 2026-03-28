@@ -28,27 +28,34 @@ internal sealed class X11ScreenCapture : IScreenCapture
 
     private static CaptureResult Capture(int x, int y, int width, int height)
     {
-        var display = XOpenDisplay(IntPtr.Zero);
-        if (display == IntPtr.Zero)
-            return new CaptureResult.Err(new CaptureError.CaptureFailed());
         try
         {
-            var root = XDefaultRootWindow(display);
-            var ximage = XGetImage(display, root, x, y, (uint)width, (uint)height, AllPlanes, ZPixmap);
-            if (ximage == IntPtr.Zero)
+            var display = XOpenDisplay(IntPtr.Zero);
+            if (display == IntPtr.Zero)
                 return new CaptureResult.Err(new CaptureError.CaptureFailed());
             try
             {
-                return XImageToFrame(ximage, width, height);
+                var root = XDefaultRootWindow(display);
+                var ximage = XGetImage(display, root, x, y, (uint)width, (uint)height, AllPlanes, ZPixmap);
+                if (ximage == IntPtr.Zero)
+                    return new CaptureResult.Err(new CaptureError.CaptureFailed());
+                try
+                {
+                    return XImageToFrame(ximage, width, height);
+                }
+                finally
+                {
+                    XDestroyImage(ximage);
+                }
             }
             finally
             {
-                XDestroyImage(ximage);
+                XCloseDisplay(display);
             }
         }
-        finally
+        catch
         {
-            XCloseDisplay(display);
+            return new CaptureResult.Err(new CaptureError.CaptureFailed());
         }
     }
 

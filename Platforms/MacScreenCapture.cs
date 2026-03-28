@@ -35,38 +35,45 @@ internal sealed class MacScreenCapture : IScreenCapture
 
     private static CaptureResult Capture(int x, int y, int width, int height)
     {
-        var rect = new CGRect { X = x, Y = y, Width = width, Height = height };
-        var image = CGWindowListCreateImage(rect, 0, 0, 0);
-        if (image == IntPtr.Zero)
-            return new CaptureResult.Err(new CaptureError.PermissionDenied());
-
         try
         {
-            int imgWidth = (int)CGImageGetWidth(image);
-            int imgHeight = (int)CGImageGetHeight(image);
-            int stride = (int)CGImageGetBytesPerRow(image);
-
-            var provider = CGImageGetDataProvider(image);
-            var data = CGDataProviderCopyData(provider);
-            if (data == IntPtr.Zero)
-                return new CaptureResult.Err(new CaptureError.CaptureFailed());
+            var rect = new CGRect { X = x, Y = y, Width = width, Height = height };
+            var image = CGWindowListCreateImage(rect, 0, 0, 0);
+            if (image == IntPtr.Zero)
+                return new CaptureResult.Err(new CaptureError.PermissionDenied());
 
             try
             {
-                int length = (int)CFDataGetLength(data);
-                var ptr = CFDataGetBytePtr(data);
-                var pixels = new byte[length];
-                Marshal.Copy(ptr, pixels, 0, length);
-                return new CaptureResult.Ok(new CapturedFrame(pixels, imgWidth, imgHeight, stride, PixelFormat.Bgra8888));
+                int imgWidth = (int)CGImageGetWidth(image);
+                int imgHeight = (int)CGImageGetHeight(image);
+                int stride = (int)CGImageGetBytesPerRow(image);
+
+                var provider = CGImageGetDataProvider(image);
+                var data = CGDataProviderCopyData(provider);
+                if (data == IntPtr.Zero)
+                    return new CaptureResult.Err(new CaptureError.CaptureFailed());
+
+                try
+                {
+                    int length = (int)CFDataGetLength(data);
+                    var ptr = CFDataGetBytePtr(data);
+                    var pixels = new byte[length];
+                    Marshal.Copy(ptr, pixels, 0, length);
+                    return new CaptureResult.Ok(new CapturedFrame(pixels, imgWidth, imgHeight, stride, PixelFormat.Bgra8888));
+                }
+                finally
+                {
+                    CFRelease(data);
+                }
             }
             finally
             {
-                CFRelease(data);
+                CFRelease(image);
             }
         }
-        finally
+        catch
         {
-            CFRelease(image);
+            return new CaptureResult.Err(new CaptureError.CaptureFailed());
         }
     }
 }
