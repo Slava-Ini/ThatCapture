@@ -53,3 +53,10 @@ switch (result)
 }
 ```
 
+## To Do
+
+- Improve error handling - handle error messages (& remove error descriptions in `CaptureError`)
+- Cleanup some garbage and inconsistencies
+- Do additional test loop on all systems
+- Update the docs
+- Publish the package
