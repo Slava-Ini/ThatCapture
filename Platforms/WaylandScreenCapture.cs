@@ -82,7 +82,7 @@ internal sealed class WaylandScreenCapture : IScreenCapture
                 handlerState: tcs
             );
 
-            var writer = connection.GetMessageWriter();
+            using var writer = connection.GetMessageWriter();
             writer.WriteMethodCallHeader(
                 destination: "org.freedesktop.portal.Desktop",
                 path: "/org/freedesktop/portal/desktop",
@@ -97,7 +97,6 @@ internal sealed class WaylandScreenCapture : IScreenCapture
             writer.WriteVariantString(token);
             writer.WriteArrayEnd(arrayStart);
             connection.TrySendMessage(writer.CreateMessage());
-            writer.Dispose();
 
             var path = await tcs.Task.WaitAsync(TimeSpan.FromSeconds(60));
             if (path == null) return new CaptureResult.Err(new CaptureError.PermissionDenied());

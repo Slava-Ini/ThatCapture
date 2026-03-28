@@ -23,6 +23,20 @@ internal sealed class X11ScreenCapture : IScreenCapture
     [DllImport("libX11.so.6")]
     private static extern int XCloseDisplay(IntPtr display);
 
+    private sealed class XDisplayHandle : SafeHandle
+    {
+        public XDisplayHandle() : base(IntPtr.Zero, true) { SetHandle(XOpenDisplay(IntPtr.Zero)); }
+        public override bool IsInvalid => handle == IntPtr.Zero;
+        protected override bool ReleaseHandle() { XCloseDisplay(handle); return true; }
+    }
+
+    private sealed class XImageHandle : SafeHandle
+    {
+        public XImageHandle(IntPtr ptr) : base(IntPtr.Zero, true) { SetHandle(ptr); }
+        public override bool IsInvalid => handle == IntPtr.Zero;
+        protected override bool ReleaseHandle() { XDestroyImage(handle); return true; }
+    }
+
     public Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height) =>
         Task.Run(() => Capture(x, y, width, height));
 
@@ -30,28 +44,16 @@ internal sealed class X11ScreenCapture : IScreenCapture
     {
         try
         {
-            var display = XOpenDisplay(IntPtr.Zero);
-            if (display == IntPtr.Zero)
+            using var display = new XDisplayHandle();
+            if (display.IsInvalid)
                 return new CaptureResult.Err(new CaptureError.CaptureFailed());
-            try
-            {
-                var root = XDefaultRootWindow(display);
-                var ximage = XGetImage(display, root, x, y, (uint)width, (uint)height, AllPlanes, ZPixmap);
-                if (ximage == IntPtr.Zero)
-                    return new CaptureResult.Err(new CaptureError.CaptureFailed());
-                try
-                {
-                    return XImageToFrame(ximage, width, height);
-                }
-                finally
-                {
-                    XDestroyImage(ximage);
-                }
-            }
-            finally
-            {
-                XCloseDisplay(display);
-            }
+
+            var root = XDefaultRootWindow(display.DangerousGetHandle());
+            using var ximage = new XImageHandle(XGetImage(display.DangerousGetHandle(), root, x, y, (uint)width, (uint)height, AllPlanes, ZPixmap));
+            if (ximage.IsInvalid)
+                return new CaptureResult.Err(new CaptureError.CaptureFailed());
+
+            return XImageToFrame(ximage.DangerousGetHandle(), width, height);
         }
         catch
         {

@@ -29,6 +29,13 @@ internal sealed class MacScreenCapture : IScreenCapture
     [StructLayout(LayoutKind.Sequential)]
     private struct CGRect { public double X, Y, Width, Height; }
 
+    private sealed class CFHandle : SafeHandle
+    {
+        public CFHandle(IntPtr ptr) : base(IntPtr.Zero, true) { SetHandle(ptr); }
+        public override bool IsInvalid => handle == IntPtr.Zero;
+        protected override bool ReleaseHandle() { CFRelease(handle); return true; }
+    }
+
     // kCGWindowListOptionAll = 0, kCGNullWindowID = 0, kCGWindowImageDefault = 0
     public Task<CaptureResult> CaptureAreaAsync(int x, int y, int width, int height) =>
         Task.Run(() => Capture(x, y, width, height));
@@ -38,38 +45,24 @@ internal sealed class MacScreenCapture : IScreenCapture
         try
         {
             var rect = new CGRect { X = x, Y = y, Width = width, Height = height };
-            var image = CGWindowListCreateImage(rect, 0, 0, 0);
-            if (image == IntPtr.Zero)
+            using var image = new CFHandle(CGWindowListCreateImage(rect, 0, 0, 0));
+            if (image.IsInvalid)
                 return new CaptureResult.Err(new CaptureError.PermissionDenied());
 
-            try
-            {
-                int imgWidth = (int)CGImageGetWidth(image);
-                int imgHeight = (int)CGImageGetHeight(image);
-                int stride = (int)CGImageGetBytesPerRow(image);
+            int imgWidth = (int)CGImageGetWidth(image.DangerousGetHandle());
+            int imgHeight = (int)CGImageGetHeight(image.DangerousGetHandle());
+            int stride = (int)CGImageGetBytesPerRow(image.DangerousGetHandle());
 
-                var provider = CGImageGetDataProvider(image);
-                var data = CGDataProviderCopyData(provider);
-                if (data == IntPtr.Zero)
-                    return new CaptureResult.Err(new CaptureError.CaptureFailed());
+            var provider = CGImageGetDataProvider(image.DangerousGetHandle());
+            using var data = new CFHandle(CGDataProviderCopyData(provider));
+            if (data.IsInvalid)
+                return new CaptureResult.Err(new CaptureError.CaptureFailed());
 
-                try
-                {
-                    int length = (int)CFDataGetLength(data);
-                    var ptr = CFDataGetBytePtr(data);
-                    var pixels = new byte[length];
-                    Marshal.Copy(ptr, pixels, 0, length);
-                    return new CaptureResult.Ok(new CapturedFrame(pixels, imgWidth, imgHeight, stride, PixelFormat.Bgra8888));
-                }
-                finally
-                {
-                    CFRelease(data);
-                }
-            }
-            finally
-            {
-                CFRelease(image);
-            }
+            int length = (int)CFDataGetLength(data.DangerousGetHandle());
+            var ptr = CFDataGetBytePtr(data.DangerousGetHandle());
+            var pixels = new byte[length];
+            Marshal.Copy(ptr, pixels, 0, length);
+            return new CaptureResult.Ok(new CapturedFrame(pixels, imgWidth, imgHeight, stride, PixelFormat.Bgra8888));
         }
         catch
         {
