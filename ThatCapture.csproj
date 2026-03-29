@@ -5,6 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- TODO: to be removed after tests -->
+  <ItemGroup>
+    <Compile Remove="scripts/**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.3" />

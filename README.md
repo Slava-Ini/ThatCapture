@@ -29,7 +29,37 @@ if (result is CaptureResult.Ok(var frame))
 }
 ```
 
-`ScreenCapture` automatically picks the right implementation for the current platform. The returned `CapturedFrame` always contains raw pixel data — no image library types in the API.
+`ScreenCapture` automatically picks the right backend for the current platform. The active backend is exposed via the `Platform` property:
+
+```csharp
+Console.WriteLine(capture.Platform);
+```
+
+To override the auto-detected platform, pass a `CapturePlatform` value to the constructor:
+
+```csharp
+var capture = new ScreenCapture(CapturePlatform.X11);
+```
+
+The returned `CapturedFrame` always contains raw pixel data — no image library types in the API.
+
+### Encoding to an image format
+
+Extension methods are available to encode a captured frame to PNG, JPEG, or WebP:
+
+```csharp
+byte[] png  = frame.ToPng();
+byte[] jpeg = frame.ToJpeg(); // default quality: 85
+byte[] jpeg = frame.ToJpeg(quality: 60);
+byte[] webp = frame.ToWebp(); // lossy by default
+byte[] webp = frame.ToWebp(lossless: true);
+```
+
+To save directly to a file:
+
+```csharp
+await File.WriteAllBytesAsync("screenshot.png", frame.ToPng());
+```
 
 ## Error handling
 
@@ -58,5 +88,4 @@ switch (result)
 - Improve error handling - handle error messages (& remove error descriptions in `CaptureError`)
 - Cleanup some garbage and inconsistencies
 - Do additional test loop on all systems
-- Update the docs
 - Publish the package

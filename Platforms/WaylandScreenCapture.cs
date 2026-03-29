@@ -82,21 +82,23 @@ internal sealed class WaylandScreenCapture : IScreenCapture
                 handlerState: tcs
             );
 
-            using var writer = connection.GetMessageWriter();
-            writer.WriteMethodCallHeader(
-                destination: "org.freedesktop.portal.Desktop",
-                path: "/org/freedesktop/portal/desktop",
-                @interface: "org.freedesktop.portal.Screenshot",
-                member: "Screenshot",
-                signature: "sa{sv}"
-            );
-            writer.WriteString("");
-            var arrayStart = writer.WriteArrayStart(DBusType.DictEntry);
-            writer.WriteStructureStart();
-            writer.WriteString("handle_token");
-            writer.WriteVariantString(token);
-            writer.WriteArrayEnd(arrayStart);
-            connection.TrySendMessage(writer.CreateMessage());
+            using (var writer = connection.GetMessageWriter())
+            {
+                writer.WriteMethodCallHeader(
+                    destination: "org.freedesktop.portal.Desktop",
+                    path: "/org/freedesktop/portal/desktop",
+                    @interface: "org.freedesktop.portal.Screenshot",
+                    member: "Screenshot",
+                    signature: "sa{sv}"
+                );
+                writer.WriteString("");
+                var arrayStart = writer.WriteArrayStart(DBusType.DictEntry);
+                writer.WriteStructureStart();
+                writer.WriteString("handle_token");
+                writer.WriteVariantString(token);
+                writer.WriteArrayEnd(arrayStart);
+                connection.TrySendMessage(writer.CreateMessage());
+            }
 
             var path = await tcs.Task.WaitAsync(TimeSpan.FromSeconds(60));
             if (path == null) return new CaptureResult.Err(new CaptureError.PermissionDenied());
