@@ -40,7 +40,9 @@ public sealed class ScreenCapture : IScreenCapture
 
     private static IScreenCapture CreateImpl(CapturePlatform platform) => platform switch
     {
+#if WINDOWS
         CapturePlatform.Windows => new WindowsScreenCapture(),
+#endif
         CapturePlatform.MacOS => new MacScreenCapture(),
         CapturePlatform.X11 => new X11ScreenCapture(),
         CapturePlatform.Wayland => new WaylandScreenCapture(),

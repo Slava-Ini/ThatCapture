@@ -1,18 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net8.0;net8.0-windows;net9.0;net9.0-windows;net10.0;net10.0-windows</TargetFrameworks>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <PackageId>ThatCapture</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Slava.In</Authors>
+    <Description>Cross-platform screen capture library for .NET. Supports Windows, macOS, Linux X11 and Linux Wayland.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Slava-Ini/ThatCapture</RepositoryUrl>
+    <PackageTags>screen;capture;screenshot;windows;macos;linux;wayland;x11</PackageTags>
   </PropertyGroup>
 
-  <!-- TODO: to be removed after tests -->
+  <!-- WindowsScreenCapture depends on System.Drawing.Common which is only
+       included for -windows TFMs, so exclude it from all other builds. -->
+  <ItemGroup Condition="!$(TargetFramework.Contains('-windows'))">
+    <Compile Remove="Platforms/WindowsScreenCapture.cs" />
+  </ItemGroup>
+
   <ItemGroup>
-    <Compile Remove="scripts/**" />
+    <Compile Remove="scripts/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.3" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.5" Condition="$(TargetFramework.Contains('-windows'))" />
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.2" />
   </ItemGroup>
 </Project>
