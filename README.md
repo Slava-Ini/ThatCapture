@@ -82,3 +82,11 @@ switch (result)
         break;
 }
 ```
+
+## Development
+
+Run the test script:
+
+```bash
+dotnet run --project scripts/TestEncoding/TestEncoding.csproj
+```
