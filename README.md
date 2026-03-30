@@ -43,7 +43,7 @@ To override the auto-detected platform, pass a `CapturePlatform` value to the co
 var capture = new ScreenCapture(CapturePlatform.X11);
 ```
 
-The returned `CapturedFrame` always contains raw pixel data — no image library types in the API.
+The returned `CapturedFrame` always contains raw pixel data.
 
 ### Encoding to an image format
 
