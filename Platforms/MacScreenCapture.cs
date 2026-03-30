@@ -64,9 +64,9 @@ internal sealed class MacScreenCapture : IScreenCapture
             Marshal.Copy(ptr, pixels, 0, length);
             return new CaptureResult.Ok(new CapturedFrame(pixels, imgWidth, imgHeight, stride, PixelFormat.Bgra8888));
         }
-        catch
+        catch (Exception ex)
         {
-            return new CaptureResult.Err(new CaptureError.CaptureFailed());
+            return new CaptureResult.Err(new CaptureError.CaptureFailed(ex.Message));
         }
     }
 }

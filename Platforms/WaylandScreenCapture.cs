@@ -116,9 +116,9 @@ internal sealed class WaylandScreenCapture : IScreenCapture
         {
             return new CaptureResult.Err(new CaptureError.Timeout());
         }
-        catch
+        catch (Exception ex)
         {
-            return new CaptureResult.Err(new CaptureError.CaptureFailed());
+            return new CaptureResult.Err(new CaptureError.CaptureFailed(ex.Message));
         }
     }
 }

@@ -34,9 +34,9 @@ internal sealed class WindowsScreenCapture : IScreenCapture
             Marshal.Copy(locked.Data.Scan0, pixels, 0, pixels.Length);
             return new CaptureResult.Ok(new CapturedFrame(pixels, width, height, stride, PixelFormat.Bgra8888));
         }
-        catch
+        catch (Exception ex)
         {
-            return new CaptureResult.Err(new CaptureError.CaptureFailed());
+            return new CaptureResult.Err(new CaptureError.CaptureFailed(ex.Message));
         }
     }
 }

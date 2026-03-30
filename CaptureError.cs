@@ -44,7 +44,8 @@ public abstract record CaptureError
     /// On X11, <c>XOpenDisplay</c> or <c>XGetImage</c> failed.
     /// On macOS, <c>CGWindowListCreateImage</c> returned no data.
     /// </summary>
-    public record CaptureFailed() : CaptureError;
+    /// <param name="Message">The underlying exception message, if available.</param>
+    public record CaptureFailed(string? Message = null) : CaptureError;
 
     /// <summary>
     /// The Wayland portal request timed out after 60 seconds without a response.
