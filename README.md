@@ -1,5 +1,7 @@
 # ThatCapture
 
+[![NuGet](https://img.shields.io/nuget/v/ThatCapture.svg)](https://www.nuget.org/packages/ThatCapture/)
+
 Small cross-platform screen capture library for .NET
 
 ## Platform support
