@@ -1,4 +1,4 @@
-# ThatCapture [DRAFT]
+# ThatCapture
 
 Small cross-platform screen capture library for .NET
 
