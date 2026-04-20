@@ -5,7 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <PackageId>ThatCapture</PackageId>
-    <Version>1.0.1</Version>
+    <PackageIcon>icon.png</PackageIcon>
+    <Version>1.0.2</Version>
     <Authors>Slava.In</Authors>
     <Description>Cross-platform screen capture library for .NET. Supports Windows, macOS, Linux X11 and Linux Wayland.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -26,6 +27,7 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>

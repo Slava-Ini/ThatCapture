@@ -17,6 +17,12 @@ internal sealed class X11ScreenCapture : IScreenCapture
     [DllImport("libX11.so.6")]
     private static extern IntPtr XDefaultRootWindow(IntPtr display);
     [DllImport("libX11.so.6")]
+    private static extern int XDefaultScreen(IntPtr display);
+    [DllImport("libX11.so.6")]
+    private static extern int XDisplayWidth(IntPtr display, int screen);
+    [DllImport("libX11.so.6")]
+    private static extern int XDisplayHeight(IntPtr display, int screen);
+    [DllImport("libX11.so.6")]
     private static extern IntPtr XGetImage(IntPtr display, IntPtr drawable, int x, int y, uint width, uint height, ulong planeMask, int format);
     [DllImport("libX11.so.6")]
     private static extern int XDestroyImage(IntPtr ximage);
@@ -44,21 +50,39 @@ internal sealed class X11ScreenCapture : IScreenCapture
     {
         try
         {
-            using var display = new XDisplayHandle();
-            if (display.IsInvalid)
+            using var handle = new XDisplayHandle();
+            if (handle.IsInvalid)
                 return new CaptureResult.Err(new CaptureError.CaptureFailed());
 
-            var root = XDefaultRootWindow(display.DangerousGetHandle());
-            using var ximage = new XImageHandle(XGetImage(display.DangerousGetHandle(), root, x, y, (uint)width, (uint)height, AllPlanes, ZPixmap));
-            if (ximage.IsInvalid)
+            (x, y, width, height) = ClampToFramebuffer(handle, x, y, width, height);
+
+            var root = XDefaultRootWindow(handle.DangerousGetHandle());
+            using var image = new XImageHandle(XGetImage(handle.DangerousGetHandle(), root, x, y, (uint)width, (uint)height, AllPlanes, ZPixmap));
+            if (image.IsInvalid)
                 return new CaptureResult.Err(new CaptureError.CaptureFailed());
 
-            return XImageToFrame(ximage.DangerousGetHandle(), width, height);
+            return XImageToFrame(image.DangerousGetHandle(), width, height);
         }
         catch (Exception ex)
         {
             return new CaptureResult.Err(new CaptureError.CaptureFailed(ex.Message));
         }
+    }
+
+    // Note: Xrandr virtual resolution can exceed physical framebuffer dimensions — `XGetImage` fails if out of bounds
+    private static (int x, int y, int width, int height) ClampToFramebuffer(XDisplayHandle handle, int x, int y, int width, int height)
+    {
+        var display = handle.DangerousGetHandle();
+        int screen = XDefaultScreen(display);
+        int fbWidth = XDisplayWidth(display, screen);
+        int fbHeight = XDisplayHeight(display, screen);
+
+        x = Math.Max(0, Math.Min(x, fbWidth - 1));
+        y = Math.Max(0, Math.Min(y, fbHeight - 1));
+        width = Math.Max(1, Math.Min(width, fbWidth - x));
+        height = Math.Max(1, Math.Min(height, fbHeight - y));
+
+        return (x, y, width, height);
     }
 
     private static CaptureResult XImageToFrame(IntPtr ximage, int width, int height)
