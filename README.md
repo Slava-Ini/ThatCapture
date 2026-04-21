@@ -1,11 +1,5 @@
 # ThatCapture
 
-## TODO
-
-- Implement hiding cursor
-- Make an option to preserve logical screen resolution for OSX
-- Make elaborate explanation for logical/physical points handling
-
 [![NuGet](https://img.shields.io/nuget/v/ThatCapture.svg)](https://www.nuget.org/packages/ThatCapture/)
 
 Small cross-platform screen capture library for .NET
