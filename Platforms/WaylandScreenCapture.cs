@@ -56,12 +56,12 @@ internal sealed class WaylandScreenCapture : IScreenCapture
 
     private static async Task<CaptureResult> TakeScreenshotAsync(int x, int y, int width, int height)
     {
-        var sessionAddress = Address.Session;
+        var sessionAddress = DBusAddress.Session;
         if (sessionAddress == null) return new CaptureResult.Err(new CaptureError.SessionBusUnavailable());
 
         try
         {
-            using var connection = new Connection(sessionAddress);
+            using var connection = new DBusConnection(sessionAddress);
             await connection.ConnectAsync();
 
             var uniqueName = connection.UniqueName;
