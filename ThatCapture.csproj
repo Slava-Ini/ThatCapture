@@ -6,7 +6,7 @@
 
     <PackageId>ThatCapture</PackageId>
     <PackageIcon>icon.png</PackageIcon>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Slava.In</Authors>
     <Description>Cross-platform screen capture library for .NET. Supports Windows, macOS, Linux X11 and Linux Wayland.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
