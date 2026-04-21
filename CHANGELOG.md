@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.3] - 2026-04-21
+
+### Fixes
+
+- Update **Tmds.DBus.Protocol** from the version with vulnarabilities to the latest stable version. 
+
 ## [1.0.2] - 2026-04-20
 
 ### Fixes
