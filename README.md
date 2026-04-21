@@ -1,4 +1,4 @@
-# ThatCapture
+# <img src="icon.png" alt="icon" width="26"/> ThatCapture
 
 [![NuGet](https://img.shields.io/nuget/v/ThatCapture.svg)](https://www.nuget.org/packages/ThatCapture/)
 
